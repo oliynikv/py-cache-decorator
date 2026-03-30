@@ -1,16 +1,18 @@
 from typing import Callable
+from functools import wraps
 
 
 def cache(func: Callable) -> Callable:
     storage = {}
-    def wrapper(*args):
-        if args in storage:
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        key = args + tuple(sorted(kwargs.items()))
+        if key in storage:
             print("Getting from cache")
-            return storage[args]
+            return storage[key]
         else:
             print("Calculating new result")
-            result = func(*args)
-            storage[args] = result
+            result = func(*args, **kwargs)
+            storage[key] = result
             return result
     return wrapper
-
